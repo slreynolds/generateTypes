@@ -1,6 +1,6 @@
 const path = require('path');
 const outputPath = path.resolve(__dirname, '../dist');
-const publicPath = process.env.PUBLIC_PATH || '/';
+const publicPath = process.env.PUBLIC_PATH || './';
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');
@@ -39,13 +39,6 @@ module.exports = {
         use: [
           { loader: 'cache-loader' },
           {
-            loader: 'thread-loader',
-            options: {
-              // there should be 1 cpu for the fork-ts-checker-webpack-plugin
-              workers: require('os').cpus().length - 1,
-            },
-          },
-          {
             loader: 'babel-loader',
             options: {
               cacheDirectory: true
@@ -63,28 +56,9 @@ module.exports = {
   },
 
   plugins: [
-    new MiniCssExtractPlugin({
-      // Options similar to the same options in webpackOptions.output
-      // both options are optional
-      filename: "[name].bundle.css",
-      chunkFilename: "[id].css"
-    }),
     new HtmlWebpackPlugin({
       title: 'Typescript Type Generator',
       template: path.resolve('src/index.ejs')
     })
   ],
-
-  optimization: {
-    splitChunks: {
-      cacheGroups: {
-        commons: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendors',
-          chunks: 'all'
-        }
-      }
-    }
-  },
-
 };
