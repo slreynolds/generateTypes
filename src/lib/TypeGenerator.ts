@@ -18,6 +18,12 @@ export default class TypeGenerator {
       .join("");
   }
 
+  keyName(s : string) : string{
+    if(s.includes(' '))
+      return '\'' + s + '\'';
+    return s;
+  }
+
   getTypes(list : any[]) : string{
     return list.map(d => typeof d + "").reduce((prev, cur) => prev === cur ? prev : "any");
   }
@@ -65,7 +71,7 @@ export default class TypeGenerator {
           if(min.includes(key)){
             // cool
           }else{
-            optObj[key] = typeof value;
+            optObj[key] = Array.isArray(value) ? 'array' : typeof value;
           }
         }
       }
@@ -74,11 +80,31 @@ export default class TypeGenerator {
       obj = a;
       out += b;
       for (let [key, value] of Object.entries(optObj)) {
-        obj[key + "?"] = value;
+        if(value === 'array'){
+          let values = s.filter(d => d[key]).map(d => d[key]);
+          let arrayType = this.getTypes(values[0]);
+          if(arrayType === "object"){
+            let key2 = this.camelCase(key);
+            out += this.generateTypes(key2, values)[0];
+            obj[key + '?'] = key2 + "[]";
+          }else{
+            obj[key + '?'] = arrayType + "[]";
+          }
+        }else if(value === 'object'){
+          let values = s.filter(d => d[key]).map(d => d[key]);
+          let r = this.generateTypes("", values);
+          //out += r[0];
+          obj[key + "?"] = JSON.parse(r[1]);
+        }else{
+          obj[key + "?"] = value;
+        }
         // if the optional obj is in the first object too
         if(obj[key]){
           delete obj[key];
         }
+      }
+      if(objName === ""){
+        return [out, JSON.stringify(obj, null, 2) + "\n"];
       }
 
       return ["type " + objName + " = " + JSON.stringify(obj, null, 2) + "\n"
@@ -98,6 +124,7 @@ export default class TypeGenerator {
   magic(objName : string, json : any) : string{
     let result = "";
     let parsed = typeof json === 'string' ? JSON.parse(json) : json;
+    console.log(parsed);
     if(Array.isArray(json)){
       result += "type " + objName + "s = " + objName + "[]\n";
     }
