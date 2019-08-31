@@ -13,32 +13,39 @@ import TypeGenerator from 'lib/TypeGenerator';
 
 // Definition of injected styles
 const styles = (theme: Theme) => createStyles({
- container: {
-      display: 'flex',
-      flexWrap: 'wrap',
-    },
-    textField: {
-      paddingLeft: "8px",
-      paddingRight: "8px",
-      width: "100%"
-    },
-    small: {
-      marginLeft: "8px",
-      marginRight: "8px",
-    },
-    dense: {
-      marginTop: "16px",
-    },
-    status: {
-      animation: `slidein 2500ms ${theme.transitions.easing.easeInOut} 200ms infinite`,
-    },
-    '@keyframes slidein': {
-      from: {opacity: 0},
-      to: {opacity: 1}
-    },
-    menu: {
-      width: 200,
-    },
+  root: {
+    width: '99%',
+    textAlign: 'center',
+    paddingTop: theme.spacing(1),
+    marginLeft: '4px',
+    marginRight: '4px',
+  },
+  container: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  textField: {
+    paddingLeft: "8px",
+    paddingRight: "8px",
+    width: "100%"
+  },
+  small: {
+    marginLeft: "8px",
+    marginRight: "8px",
+  },
+  dense: {
+    marginTop: "16px",
+  },
+  status: {
+    animation: `slidein 2500ms ${theme.transitions.easing.easeInOut} 200ms infinite`,
+  },
+  '@keyframes slidein': {
+    from: {opacity: 0},
+    to: {opacity: 1}
+  },
+  menu: {
+    width: 200,
+  },
 });
 
 // Component state
@@ -51,7 +58,7 @@ interface ComponentState {
   in: string,
 }
 
-class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
+class App extends Component<WithStyles<typeof styles>, ComponentState> {
   // Empty constructor, only here for demo purposes
   constructor(props: WithStyles<typeof styles>) {
     super(props);
@@ -94,7 +101,10 @@ class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
    * The component's render method
    */
   render() {
+     const { classes } = this.props;
     return (
+  <div className={classes.root}>
+    <main>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">
@@ -107,7 +117,7 @@ class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
             Enter your JSON in the left and you get a super basic Typescript configuration on the right
           </Typography>
           <hr />
-          <div className={this.props.classes.status}>
+          <div className={classes.status}>
             <Typography>
               {this.state.status}
             </Typography>
@@ -131,7 +141,7 @@ class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
             InputProps={{
               readOnly: true,
             }}
-            className={this.props.classes.small}
+            className={classes.small}
             margin="normal"
             variant="outlined"
             value={this.state.error}
@@ -145,7 +155,7 @@ class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
               placeholder="Placeholder"
               multiline
               rowsMax="30"
-              className={this.props.classes.textField}
+              className={classes.textField}
               margin="normal"
               variant="outlined"
               onChange={(d) => this.setState({in: d.target.value})}
@@ -160,18 +170,19 @@ class HomePage extends Component<WithStyles<typeof styles>, ComponentState> {
               InputProps={{
                 readOnly: true,
               }}
-              className={this.props.classes.textField}
+              className={classes.textField}
               margin="normal"
               variant="outlined"
               value={this.state.out}
             />
           </Grid>
         </Grid>
-
       </Grid>
+    </main>
+  </div>
     );
   }
 
 }
 
-export default withStyles(styles)(HomePage);
+export default withStyles(styles)(App);
