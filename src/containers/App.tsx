@@ -9,6 +9,7 @@ import {
 
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
 
+import Dropzone from 'react-dropzone';
 import TypeGenerator from 'lib/TypeGenerator';
 
 // Definition of injected styles
@@ -56,6 +57,7 @@ interface ComponentState {
   loading: boolean,
   name: string,
   in: string,
+  files: File[],
 }
 
 class App extends Component<WithStyles<typeof styles>, ComponentState> {
@@ -64,6 +66,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
     super(props);
 
     this.state = {
+      files: [],
       out: "",
       error: "",
       status: "",
@@ -81,7 +84,24 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
         prevState.name != this.state.name){
         this.parseString();
       }
+      if(prevState.files.length != this.state.files.length){
+        this.parseFiles();
+      }
     }
+  }
+
+  parseFiles(){
+    // start filereader
+    console.log(this.state.files);
+    this.state.files.forEach(d => {
+      let fr = new FileReader();
+      fr.onload = (event) => {
+        let str : string = event && event.target ? event.target.result as string : "";
+        let name = new TypeGenerator().camelCase(d.name.substr(0,d.name.indexOf('.')));
+        this.setState({name: name, in: str});
+      };
+      fr.readAsText(d);
+    });
   }
 
 
@@ -108,6 +128,20 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
       copyText.select();
       document.execCommand("copy");
     });
+  }
+
+
+  renderDropzone(){
+    return (<Dropzone onDrop={acceptedFiles => this.setState({files: acceptedFiles})}>
+          {({getRootProps, getInputProps}) => (
+            <section>
+              <div {...getRootProps()}>
+                <input {...getInputProps()} />
+                <p>Drag 'n' drop some files here, or click to select files</p>
+              </div>
+            </section>
+          )}
+        </Dropzone>);
   }
 
   /**
@@ -138,6 +172,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
           <Button onClick={this.copyToClipboard}>
             Copy to Clipboard
           </Button>
+          {this.renderDropzone()}
         </Grid>
 
         <Grid item xs ={6} justify="flex-start">
@@ -174,6 +209,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
               className={classes.textField}
               margin="normal"
               variant="outlined"
+              value={this.state.in}
               onChange={(d) => this.setState({in: d.target.value})}
             />
           </Grid>
