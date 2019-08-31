@@ -1,6 +1,6 @@
 const path = require('path');
 const outputPath = path.resolve(__dirname, '../dist');
-const publicPath = process.env.PUBLIC_PATH || './';
+const publicPath = process.env.PUBLIC_PATH || '';
 
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const HtmlWebpackPlugin = require('html-webpack-plugin');

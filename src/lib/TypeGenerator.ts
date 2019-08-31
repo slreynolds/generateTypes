@@ -18,10 +18,12 @@ export default class TypeGenerator {
       .join("");
   }
 
-  keyName(s : string) : string{
-    if(s.includes(' '))
-      return '\'' + s + '\'';
-    return s;
+  normalizeKeyName(s : string) : string{
+    let alphaNumeric = new RegExp(/\W/);
+    if(!alphaNumeric.test(s))
+      return s;
+    let regex = /'/gi;
+    return '\'' + s.replace(regex, '\\\'') + '\'';
   }
 
   getTypes(list : any[]) : string{
@@ -33,6 +35,7 @@ export default class TypeGenerator {
     let out = "";
     for (let [key, value] of Object.entries(s)) {
       let typeOfValue = typeof value;
+      key = this.normalizeKeyName(key);
       if(Array.isArray(value)){
         if(value.length > 0){
           let arrayType = this.getTypes(value);
@@ -80,6 +83,7 @@ export default class TypeGenerator {
       obj = a;
       out += b;
       for (let [key, value] of Object.entries(optObj)) {
+        key = this.normalizeKeyName(key);
         if(value === 'array'){
           let values = s.filter(d => d[key]).map(d => d[key]);
           let arrayType = this.getTypes(values[0]);
@@ -125,7 +129,7 @@ export default class TypeGenerator {
     let result = "";
     let parsed = typeof json === 'string' ? JSON.parse(json) : json;
     console.log(parsed);
-    if(Array.isArray(json)){
+    if(Array.isArray(parsed)){
       result += "type " + objName + "s = " + objName + "[]\n";
     }
     result += this.generateTypes(objName, parsed)[0];
