@@ -71,6 +71,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
       name: "",
       in: "",
     };
+    this.copyToClipboard = this.copyToClipboard.bind(this);
   }
 
   componentDidUpdate(prevProps : WithStyles<typeof styles>, prevState : ComponentState) {
@@ -95,6 +96,18 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
       console.log(e);
       this.setState({loading: false, status: "error", error: e});
     }
+  }
+
+  copyToClipboard(){
+    let newClip = this.state.out;
+    navigator.clipboard.writeText(newClip).then(() => {
+      console.log("clipboard successfully set");
+    }, () => {
+      console.log("clipboard write failed, try something else instead:");
+      var copyText : any = document.querySelector("#outlined-types");
+      copyText.select();
+      document.execCommand("copy");
+    });
   }
 
   /**
@@ -122,6 +135,9 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
               {this.state.status}
             </Typography>
           </div>
+          <Button onClick={this.copyToClipboard}>
+            Copy to Clipboard
+          </Button>
         </Grid>
 
         <Grid item xs ={6} justify="flex-start">
@@ -163,6 +179,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
           </Grid>
           <Grid item xs={6}>
             <TextField
+            onClick={this.copyToClipboard}
               id="outlined-types"
               label="Output Types"
               placeholder="Placeholder"
