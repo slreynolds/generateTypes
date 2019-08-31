@@ -79,9 +79,16 @@ export default class TypeGenerator {
         }
       }
 
+      // TODO: this should iterate over the array to findd outliers
       let [a,b] = this.parseObject(s[0]);
       obj = a;
       out += b;
+      /*
+      for (let key of min) {
+        obj[key] = [...new Set(s.map(d => typeof d[key] + ""))]
+          .reduce((prev,cur) => prev + " | " + cur);
+      }
+      */
       for (let [key, value] of Object.entries(optObj)) {
         key = this.normalizeKeyName(key);
         if(value === 'array'){
@@ -100,6 +107,7 @@ export default class TypeGenerator {
           //out += r[0];
           obj[key + "?"] = JSON.parse(r[1]);
         }else{
+          // TODO: here too
           obj[key + "?"] = value;
         }
         // if the optional obj is in the first object too
