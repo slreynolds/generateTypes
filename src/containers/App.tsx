@@ -130,6 +130,11 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
     });
   }
 
+  prettifyInputObject(){
+    this.setState(prev => {return{
+          in: JSON.stringify(JSON.parse(prev.in), null, 2)
+        }});
+  }
 
   renderDropzone(){
     return (<Dropzone onDrop={acceptedFiles => this.setState({files: acceptedFiles})}>
@@ -171,6 +176,9 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
           </div>
           <Button onClick={this.copyToClipboard}>
             Copy to Clipboard
+          </Button>
+          <Button onClick={this.prettifyInputObject}>
+            Make Input Object Pretty
           </Button>
           {this.renderDropzone()}
         </Grid>
