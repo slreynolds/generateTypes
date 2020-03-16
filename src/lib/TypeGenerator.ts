@@ -49,6 +49,8 @@ export default class TypeGenerator {
         }else{
           obj[key] = "any[]";
         }
+      }else if(value === undefined || value === null){
+        obj[key] = "null";
       }else if(typeOfValue === "object"){
         let r = this.generateTypes("", value);
         out += r[0];
@@ -79,7 +81,7 @@ export default class TypeGenerator {
         }
       }
 
-      // TODO: this should iterate over the array to findd outliers
+      // TODO: should iterate over the array to find outliers
       let [a,b] = this.parseObject(s[0]);
       obj = a;
       out += b;
@@ -136,7 +138,7 @@ export default class TypeGenerator {
   magic(objName : string, json : any) : string{
     let result = "";
     let parsed = typeof json === 'string' ? JSON.parse(json) : json;
-    console.log(parsed);
+    console.log('json is: ', parsed);
     if(Array.isArray(parsed)){
       result += "type " + objName + "s = " + objName + "[]\n";
     }
