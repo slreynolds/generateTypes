@@ -95,13 +95,17 @@ export default class TypeGenerator {
         key = this.normalizeKeyName(key);
         if(value === 'array'){
           let values = s.filter(d => d[key]).map(d => d[key]);
-          let arrayType = this.getTypes(values[0]);
-          if(arrayType === "object"){
-            let key2 = this.camelCase(key);
-            out += this.generateTypes(key2, values)[0];
-            obj[key + '?'] = key2 + "[]";
+          if(values.length === 0){
+            obj[key + '?'] = "any[]";
           }else{
-            obj[key + '?'] = arrayType + "[]";
+            let arrayType = this.getTypes(values[0]);
+            if(arrayType === "object"){
+              let key2 = this.camelCase(key);
+              out += this.generateTypes(key2, values)[0];
+              obj[key + '?'] = key2 + "[]";
+            }else{
+              obj[key + '?'] = arrayType + "[]";
+            }
           }
         }else if(value === 'object'){
           let values = s.filter(d => d[key]).map(d => d[key]);
