@@ -10,7 +10,7 @@ import {
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
 
 import Dropzone from 'react-dropzone';
-import TypeGenerator from 'lib/TypeGenerator';
+import TypeGenerator from 'lib/type-generator';
 
 // Definition of injected styles
 const styles = (theme: Theme) => createStyles({
@@ -47,6 +47,29 @@ const styles = (theme: Theme) => createStyles({
   menu: {
     width: 200,
   },
+  buttonlike: {
+    color: '#fff',
+    backgroundColor: '#3f51b5',
+    padding: '6px 16px',
+    fontSize: '0.875rem',
+    cursor: 'pointer',
+    minWidth: '64px',
+    maxWidth: '140px',
+    height: '36px',
+    float: 'left',
+    boxSizing: 'border-box',
+    transition: 'background-color 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,box-shadow 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms,border 250ms cubic-bezier(0.4, 0, 0.2, 1) 0ms',
+    fontFamily: '"Roboto", "Helvetica", "Arial", sans-serif',
+    fontWeight: 500,
+    lineHeight: 1.75,
+    borderRadius: '4px',
+    letterSpacing: '0.02857em',
+    textTransform: 'uppercase',
+    '&:hover': {
+      cursor: "select",
+      backgroundColor: "#303f9f",
+    }
+  }
 });
 
 // Component state
@@ -137,14 +160,15 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
   }
 
   renderDropzone(){
+    const { classes } = this.props;
     return (<Dropzone onDrop={acceptedFiles => this.setState({files: acceptedFiles})}>
           {({getRootProps, getInputProps}) => (
-            <section>
               <div {...getRootProps()}>
+            <section className={classes.buttonlike}>
                 <input {...getInputProps()} />
-                <p>Drag 'n' drop some files here, or click to select files</p>
-              </div>
+                <div>Select File</div>
             </section>
+              </div>
           )}
         </Dropzone>);
   }
@@ -153,14 +177,15 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
    * The component's render method
    */
   render() {
-     const { classes } = this.props;
+
+    const { classes } = this.props;
     return (
   <div className={classes.root}>
     <main>
       <Grid container spacing={2}>
         <Grid item xs={12}>
           <Typography variant="h4">
-            JSON to Typescript Type
+            JSON to TS Types
           </Typography>
         </Grid>
 
@@ -168,19 +193,6 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
           <Typography variant="subtitle1">
             Enter your JSON in the left and you get a super basic Typescript configuration on the right
           </Typography>
-          <hr />
-          <div className={classes.status}>
-            <Typography>
-              {this.state.status}
-            </Typography>
-          </div>
-          <Button onClick={this.copyToClipboard}>
-            Copy to Clipboard
-          </Button>
-          <Button onClick={this.prettifyInputObject}>
-            Make Input Object Pretty
-          </Button>
-          {this.renderDropzone()}
         </Grid>
 
         <Grid item xs ={6} justify="flex-start">
@@ -208,6 +220,12 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
         </Grid>
         <Grid item xs={12} container>
           <Grid item xs={6}>
+            <Grid container>
+              {this.renderDropzone()}
+              <Button variant="contained" color="primary" onClick={() => this.prettifyInputObject()}>
+                Prettify
+              </Button>
+            </Grid>
             <TextField
               id="outlined-textarea"
               label="Input Object"
@@ -222,8 +240,14 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
             />
           </Grid>
           <Grid item xs={6}>
+            <Grid>
+              <Button variant="contained" color="primary" onClick={() => this.copyToClipboard()}>
+                Copy to Clipboard
+              </Button>
+            </Grid>
+
             <TextField
-            onClick={this.copyToClipboard}
+              onClick={() => this.copyToClipboard()}
               id="outlined-types"
               label="Output Types"
               placeholder="Placeholder"
