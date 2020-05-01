@@ -5,6 +5,7 @@ import {
   Typography,
   Grid,
   TextField,
+  Box
 } from '@material-ui/core';
 
 import { createStyles, Theme, WithStyles, withStyles } from '@material-ui/core';
@@ -46,6 +47,9 @@ const styles = (theme: Theme) => createStyles({
   },
   menu: {
     width: 200,
+  },
+  settingsbar: {
+    height: 50,
   },
   buttonlike: {
     color: '#fff',
@@ -130,15 +134,16 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
 
   parseString(){
     this.setState({loading: true, status: "Working..."});
-    try{
-      let name = this.state.name || "Thing";
-      let str = this.state.in;
-      let result = new TypeGenerator().magic(name, str);
-      this.setState({loading: false, status: "success", error: "", out: result});
-    }catch(e){
-      console.log(e);
-      this.setState({loading: false, status: "error", error: e});
-    }
+    let name = this.state.name || "Thing";
+    let str = this.state.in;
+    new TypeGenerator().magicPromise(name, str)
+      .then(d => {
+        this.setState({loading: false, status: "success", error: "", out: d});
+      })
+      .catch((e : Error) => {
+        console.log(e);
+        this.setState({loading: false, status: "error", error: e.message});
+      });
   }
 
   copyToClipboard(){
@@ -196,31 +201,12 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
         </Grid>
 
         <Grid item xs ={6} justify="flex-start">
-          <TextField
-            id="outlined-name"
-            label="Name"
-            placeholder="Name"
-            margin="normal"
-            value={this.state.name}
-            onChange={(d) => this.setState({name: d.target.value})}
-          />
-          <TextField
-            id="outlined-error"
-            label="Error"
-            placeholder=""
-            multiline
-            InputProps={{
-              readOnly: true,
-            }}
-            className={classes.small}
-            margin="normal"
-            variant="outlined"
-            value={this.state.error}
-          />
         </Grid>
         <Grid item xs={12} container>
           <Grid item xs={6}>
-            <Grid container>
+            <Grid container
+              className={classes.settingsbar}
+              justify="center">
               {this.renderDropzone()}
               <Button variant="contained" color="primary" onClick={() => this.prettifyInputObject()}>
                 Prettify
@@ -233,6 +219,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
               multiline
               rowsMax="30"
               className={classes.textField}
+              color="primary"
               margin="normal"
               variant="outlined"
               value={this.state.in}
@@ -240,12 +227,24 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
             />
           </Grid>
           <Grid item xs={6}>
-            <Grid>
+            <Grid className={classes.settingsbar}
+              justify="center">
+              <TextField
+                id="outlined-name"
+                label="Name"
+                placeholder="Top Type Name"
+                margin="normal"
+                value={this.state.name}
+                onChange={(d) => this.setState({name: d.target.value})}
+              />
               <Button variant="contained" color="primary" onClick={() => this.copyToClipboard()}>
                 Copy to Clipboard
               </Button>
             </Grid>
 
+            <Box display={this.state.error === "" ? "none" : null}>
+              {this.state.error}
+            </Box>
             <TextField
               onClick={() => this.copyToClipboard()}
               id="outlined-types"

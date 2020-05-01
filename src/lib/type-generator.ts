@@ -151,4 +151,10 @@ export default class TypeGenerator {
     return result;
   }
 
+  magicPromise(objName : string, json : any) : Promise<string>{
+    return new Promise((resolve, reject) => {
+      resolve(this.magic(objName, json));
+    });
+  }
+
 }
