@@ -29,7 +29,7 @@ const styles = (theme: Theme) => createStyles({
   textField: {
     paddingLeft: "8px",
     paddingRight: "8px",
-    width: "100%"
+    width: "99%"
   },
   small: {
     marginLeft: "8px",
@@ -41,6 +41,9 @@ const styles = (theme: Theme) => createStyles({
   status: {
     animation: `slidein 2500ms ${theme.transitions.easing.easeInOut} 200ms infinite`,
   },
+  button: {
+    height: 36,
+  },
   '@keyframes slidein': {
     from: {opacity: 0},
     to: {opacity: 1}
@@ -48,8 +51,11 @@ const styles = (theme: Theme) => createStyles({
   menu: {
     width: 200,
   },
-  settingsbar: {
-    height: 50,
+  settingsLeft: {
+    height: 76
+  },
+  settingsRight: {
+    height: 70
   },
   buttonlike: {
     color: '#fff',
@@ -120,6 +126,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
   parseFiles(){
     // start filereader
     console.log(this.state.files);
+    // TODO this only uses the last file as input
     this.state.files.forEach(d => {
       let fr = new FileReader();
       fr.onload = (event) => {
@@ -133,7 +140,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
 
 
   parseString(){
-    this.setState({loading: true, status: "Working..."});
+    this.setState({loading: true, status: "loading"});
     let name = this.state.name || "Thing";
     let str = this.state.in;
     new TypeGenerator().magicPromise(name, str)
@@ -149,9 +156,9 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
   copyToClipboard(){
     let newClip = this.state.out;
     navigator.clipboard.writeText(newClip).then(() => {
-      console.log("clipboard successfully set");
+      this.setState({status: "clipboard successfully set"});
     }, () => {
-      console.log("clipboard write failed, try something else instead:");
+      this.setState({status: "clipboard write might have failed"});
       var copyText : any = document.querySelector("#outlined-types");
       copyText.select();
       document.execCommand("copy");
@@ -171,7 +178,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
               <div {...getRootProps()}>
             <section className={classes.buttonlike}>
                 <input {...getInputProps()} />
-                <div>Select File</div>
+                <div>Select A File</div>
             </section>
               </div>
           )}
@@ -182,88 +189,99 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
    * The component's render method
    */
   render() {
-
     const { classes } = this.props;
     return (
-  <div className={classes.root}>
-    <main>
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Typography variant="h4">
-            JSON to TS Types
-          </Typography>
-        </Grid>
-
-        <Grid item xs={12}>
-          <Typography variant="subtitle1">
-            Enter your JSON in the left and you get a super basic Typescript configuration on the right
-          </Typography>
-        </Grid>
-
-        <Grid item xs ={6} justify="flex-start">
-        </Grid>
-        <Grid item xs={12} container>
-          <Grid item xs={6}>
-            <Grid container
-              className={classes.settingsbar}
-              justify="center">
-              {this.renderDropzone()}
-              <Button variant="contained" color="primary" onClick={() => this.prettifyInputObject()}>
-                Prettify
-              </Button>
+      <div className={classes.root}>
+        <main>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Typography variant="h4">
+                JSON to TS Types
+              </Typography>
+              <Typography variant="subtitle1">
+                Enter your JSON on the left and you get a super basic TypeScript types on the right
+              </Typography>
             </Grid>
-            <TextField
-              id="outlined-textarea"
-              label="Input Object"
-              placeholder="Placeholder"
-              multiline
-              rowsMax="30"
-              className={classes.textField}
-              color="primary"
-              margin="normal"
-              variant="outlined"
-              value={this.state.in}
-              onChange={(d) => this.setState({in: d.target.value})}
-            />
-          </Grid>
-          <Grid item xs={6}>
-            <Grid className={classes.settingsbar}
-              justify="center">
-              <TextField
-                id="outlined-name"
-                label="Name"
-                placeholder="Top Type Name"
-                margin="normal"
-                value={this.state.name}
-                onChange={(d) => this.setState({name: d.target.value})}
-              />
-              <Button variant="contained" color="primary" onClick={() => this.copyToClipboard()}>
-                Copy to Clipboard
-              </Button>
+            <Grid item xs={12}>
+              <Typography variant="subtitle1" className={classes.status}>
+                {this.state.status}
+              </Typography>
+              {this.state.error != "" &&
+                <Box>
+                  {this.state.error}
+                </Box>
+              }
             </Grid>
 
-            <Box display={this.state.error === "" ? "none" : null}>
-              {this.state.error}
-            </Box>
-            <TextField
-              onClick={() => this.copyToClipboard()}
-              id="outlined-types"
-              label="Output Types"
-              placeholder="Placeholder"
-              multiline
-              InputProps={{
-                readOnly: true,
-              }}
-              className={classes.textField}
-              margin="normal"
-              variant="outlined"
-              value={this.state.out}
-            />
+            <Grid item xs ={6} justify="flex-start">
+            </Grid>
+            <Grid item xs={12} container>
+              <Grid item xs={6}>
+                <Grid container
+                  spacing={2}
+                  className={classes.settingsLeft}
+                  justify="center">
+                  <Grid item>
+                    {this.renderDropzone()}
+                  </Grid>
+                  <Grid item>
+                    <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={() => this.prettifyInputObject()}>
+                      Prettify Input
+                    </Button>
+                  </Grid>
+                </Grid>
+                <TextField
+                  id="outlined-textarea"
+                  label="Input JSON"
+                  placeholder="Placeholder"
+                  multiline
+                  rowsMax="30"
+                  className={classes.textField}
+                  color="primary"
+                  margin="normal"
+                  variant="outlined"
+                  value={this.state.in}
+                  onChange={(d) => this.setState({in: d.target.value})}
+                />
+              </Grid>
+              <Grid item xs={6}>
+                <Grid className={classes.settingsRight}
+                  justify="center">
+                  <TextField
+                    id="outlined-name"
+                    label="Name"
+                    placeholder="Top Type Name"
+                    margin="normal"
+                    value={this.state.name}
+                    onChange={(d) => this.setState({name: d.target.value})}
+                  />
+                  <Button variant="contained" color="primary" onClick={() => this.copyToClipboard()}>
+                    Copy to Clipboard
+                  </Button>
+                </Grid>
+                <TextField
+                  disabled
+                  onClick={() => this.copyToClipboard()}
+                  id="outlined-types"
+                  label="Output Types"
+                  placeholder="Placeholder"
+                  multiline
+                  InputProps={{
+                    readOnly: true,
+                  }}
+                  className={classes.textField}
+                  margin="normal"
+                  variant="outlined"
+                  value={this.state.out}
+                />
+              </Grid>
+            </Grid>
           </Grid>
-        </Grid>
-      </Grid>
-    </main>
-  </div>
+        </main>
+      </div>
     );
   }
 
