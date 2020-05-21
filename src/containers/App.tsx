@@ -216,7 +216,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
             <Grid item xs ={6} justify="flex-start">
             </Grid>
             <Grid item xs={12} container>
-              <Grid item xs={6}>
+              <Grid item md={6} xs={12}>
                 <Grid container
                   spacing={2}
                   className={classes.settingsLeft}
@@ -247,7 +247,7 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
                   onChange={(d) => this.setState({in: d.target.value})}
                 />
               </Grid>
-              <Grid item xs={6}>
+              <Grid item md={6} xs={12}>
                 <Grid className={classes.settingsRight}
                   justify="center">
                   <TextField
@@ -263,7 +263,6 @@ class App extends Component<WithStyles<typeof styles>, ComponentState> {
                   </Button>
                 </Grid>
                 <TextField
-                  disabled
                   onClick={() => this.copyToClipboard()}
                   id="outlined-types"
                   label="Output Types"
